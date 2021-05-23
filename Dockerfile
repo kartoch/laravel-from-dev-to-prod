@@ -4,9 +4,9 @@ ARG PHP_DOCKER_TAG=8.0.6-apache-buster
 
 FROM node:${NODE_DOCKER_TAG} as node-base
 
-FROM node-base as node-prod
+WORKDIR /home/node/app
 
-WORKDIR /home/node/app 
+FROM node-base as node-prod
 
 COPY package.json .
 
@@ -16,6 +16,16 @@ COPY webpack.mix.js .
 ADD resources/ resources/
 
 RUN npm run prod
+
+FROM node-base as node-dev
+
+VOLUME /home/node/app
+
+CMD ["npm","run","watch"]
+
+COPY docker/node-entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 FROM composer:${COMPOSER_DOCKER_TAG} as composer
 
@@ -61,7 +71,7 @@ VOLUME /var/www/html/
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
-COPY docker/entrypoint.sh /
+COPY docker/laravel-entrypoint.sh /entrypoint.sh
 
 CMD ["apache2-foreground"]
 
