@@ -25,6 +25,10 @@ docker-compose build
 docker-compose up
 ```
 
+By default, Laravel application is available in port 80.
+
+The node image install the dependencies if not present, so except few minutes before mix dependencies are available.
+
 ## Production
 
 Build the image for production :
