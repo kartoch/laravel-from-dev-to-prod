@@ -79,7 +79,19 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 FROM php-base AS php-test
 
-COPY . .
+COPY app/ app/
+COPY boostrap/ bootstrap/
+COPY config/ config/
+COPY database/ database/
+COPY public/ public/
+COPY resources/ resources/
+COPY routes/ routes/
+COPY server.php .
+
+COPY tests/ tests/
+COPY phpunit.xml .
+
+COPY .env.testing .
 
 COPY --from=node-prod  /home/node/app/public/js/ public/js/
 COPY --from=node-prod  /home/node/app/public/css/ public/css/
@@ -95,4 +107,22 @@ FROM php-base AS php-prod
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
+COPY app/ app/
+COPY boostrap/ bootstrap/
+COPY config/ config/
+COPY database/ database/
+COPY public/ public/
+COPY resources/ resources/
+COPY routes/ routes/
+COPY server.php .
+
+COPY composer.json .
+COPY composer.lock .
+
+COPY --from=node-prod  /home/node/app/public/js/ public/js/
+COPY --from=node-prod  /home/node/app/public/css/ public/css/
+
 RUN rm -rf vendor/ && composer install --no-dev
+
+RUN chown -R www-data:www-data /var/www/html/storage/ && \
+    chmod -R 700 /var/www/html/storage/
