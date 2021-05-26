@@ -99,7 +99,13 @@ COPY --from=node-prod  /home/node/app/public/css/ public/css/
 
 RUN composer install
 
-RUN chown -R www-data:www-data /var/www/html/storage/ && \
+RUN mkdir -p /var/www/html/storage/logs/ && \
+    mkdir -p /var/www/html/storage/app/public/ && \
+    mkdir -p /var/www/html/storage/framework/cache/data/ && \
+    mkdir -p /var/www/html/storage/framework/sessions/ && \
+    mkdir -p /var/www/html/storage/framework/testing/ && \
+    mkdir -p /var/www/html/storage/framework/views/ && \
+    chown -R www-data:www-data /var/www/html/storage/ && \
     chmod -R 700 /var/www/html/storage/
 
 RUN ./vendor/bin/phpunit
@@ -126,5 +132,11 @@ COPY --from=node-prod  /home/node/app/public/css/ public/css/
 
 RUN rm -rf vendor/ && composer install --no-dev
 
-RUN chown -R www-data:www-data /var/www/html/storage/ && \
+RUN mkdir -p /var/www/html/storage/logs/ && \
+    mkdir -p /var/www/html/storage/app/public/ && \
+    mkdir -p /var/www/html/storage/framework/cache/data/ && \
+    mkdir -p /var/www/html/storage/framework/sessions/ && \
+    mkdir -p /var/www/html/storage/framework/testing/ && \
+    mkdir -p /var/www/html/storage/framework/views/ && \
+    chown -R www-data:www-data /var/www/html/storage/ && \
     chmod -R 700 /var/www/html/storage/
