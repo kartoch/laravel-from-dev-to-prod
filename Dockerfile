@@ -91,8 +91,8 @@ RUN chown -R www-data:www-data /var/www/html/storage/ && \
 
 RUN ./vendor/bin/phpunit
 
-FROM php-test AS php-prod
+FROM php-base AS php-prod
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-RUN rm -rf vendor/ && composer install
+RUN rm -rf vendor/ && composer install --no-dev
