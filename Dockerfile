@@ -80,7 +80,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 FROM php-base AS php-test
 
 COPY app/ app/
-COPY boostrap/ bootstrap/
+COPY bootstrap/ bootstrap/
 COPY config/ config/
 COPY database/ database/
 COPY public/ public/
@@ -108,7 +108,7 @@ FROM php-base AS php-prod
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 COPY app/ app/
-COPY boostrap/ bootstrap/
+COPY bootstrap/ bootstrap/
 COPY config/ config/
 COPY database/ database/
 COPY public/ public/
