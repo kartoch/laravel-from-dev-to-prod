@@ -79,6 +79,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 FROM php-base AS php-test
 
+COPY artisan .
 COPY app/ app/
 COPY bootstrap/ bootstrap/
 COPY config/ config/
@@ -107,6 +108,7 @@ FROM php-base AS php-prod
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
+COPY artisan .
 COPY app/ app/
 COPY bootstrap/ bootstrap/
 COPY config/ config/
