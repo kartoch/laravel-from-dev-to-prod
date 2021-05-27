@@ -42,16 +42,12 @@ ARG SWOOLE_PECL_VERSION=4.6.7
 RUN apt-get update && \
     apt-get install -y libxml2-dev zlib1g-dev libedit-dev libldb-dev libldap2-dev libzip-dev libmemcached-dev \
                        zlib1g-dev libpq-dev libpng-dev libkrb5-dev libonig-dev libcurl4-openssl-dev libc-client-dev \
-                       default-mysql-client postgresql-client gosu curl ca-certificates zip unzip git libsqlite3-dev libgmp-dev \&& \
-    ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h && \
-    ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so && \
-    ln -s /usr/lib/x86_64-linux-gnu/liblber.so /usr/lib/liblber.so && \
-    docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && \
+                       default-mysql-client postgresql-client gosu curl ca-certificates zip unzip git && \
     docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd && \
     docker-php-ext-configure mysqli --with-mysqli=mysqlnd && \
-    docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/lib && \
     docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
-    docker-php-ext-install -j$(nproc) pdo_mysql zip pgsql gd gmp curl imap mysqli mbstring xml zip bcmath soap intl readline ldap && \
+    docker-php-ext-install -j$(nproc) pdo_mysql zip pgsql gd curl imap mysqli mbstring xml zip bcmath soap intl \
+                                      readline ldap && \
     pecl channel-update https://pecl.php.net/channel.xml && \
     pecl install memcached-$MEMCACHED_PECL_VERSION && \ 
     pecl install msgpack-$MSGPACK_PECL_VERSION && \
