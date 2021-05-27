@@ -2,10 +2,6 @@
 
 **Goal**: build laravel docker image optimized from production but compatible for development based on the template provided by [https://laravel.build/](https://laravel.build/) without sail.
 
-## Goals
-
-
-
 ## Prerequisites
 
 Tested on Ubuntu 20.04 with the following tools :
