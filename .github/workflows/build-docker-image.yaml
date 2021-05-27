@@ -39,7 +39,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: docker.pkg.github.com/kartoch/laravel-from-dev-to-prod/laravel-production:latest
+          tags: kartoch/laravel-from-dev-to-prod:latest
           target: php-prod
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
