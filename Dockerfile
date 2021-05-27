@@ -29,7 +29,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 FROM composer:${COMPOSER_DOCKER_TAG} as composer
 
-FROM php:8.0.6-apache-buster AS php-base
+FROM php:8.0.6-apache-buster AS php-root
 
 LABEL maintainer="Julien Cartigny <kartoch@gmail.com>"
 
@@ -65,7 +65,7 @@ RUN a2enmod negotiation && a2enmod rewrite
 
 WORKDIR /var/www/html/
 
-FROM php-base AS php-dev
+FROM php-root AS php-dev
 
 VOLUME /var/www/html/
 
@@ -77,49 +77,13 @@ CMD ["apache2-foreground"]
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-FROM php-base AS php-test
+FROM php-root AS php-base
 
 COPY artisan .
 COPY app/ app/
 COPY bootstrap/ bootstrap/
 COPY config/ config/
 COPY database/ database/
-COPY public/ public/
-COPY resources/ resources/
-COPY routes/ routes/
-COPY server.php .
-
-COPY tests/ tests/
-COPY phpunit.xml .
-
-COPY .env.testing .
-
-COPY --from=node-prod  /home/node/app/public/js/ public/js/
-COPY --from=node-prod  /home/node/app/public/css/ public/css/
-
-RUN composer install
-
-RUN mkdir -p /var/www/html/storage/logs/ && \
-    mkdir -p /var/www/html/storage/app/public/ && \
-    mkdir -p /var/www/html/storage/framework/cache/data/ && \
-    mkdir -p /var/www/html/storage/framework/sessions/ && \
-    mkdir -p /var/www/html/storage/framework/testing/ && \
-    mkdir -p /var/www/html/storage/framework/views/ && \
-    chown -R www-data:www-data /var/www/html/storage/ && \
-    chmod -R 700 /var/www/html/storage/
-
-RUN ./vendor/bin/phpunit
-
-FROM php-base AS php-prod
-
-RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
-
-COPY artisan .
-COPY app/ app/
-COPY bootstrap/ bootstrap/
-COPY config/ config/
-COPY database/ database/
-COPY public/ public/
 COPY resources/ resources/
 COPY routes/ routes/
 COPY server.php .
@@ -130,7 +94,7 @@ COPY composer.lock .
 COPY --from=node-prod  /home/node/app/public/js/ public/js/
 COPY --from=node-prod  /home/node/app/public/css/ public/css/
 
-RUN rm -rf vendor/ && composer install --no-dev
+COPY public/* public/
 
 RUN mkdir -p /var/www/html/storage/logs/ && \
     mkdir -p /var/www/html/storage/app/public/ && \
@@ -140,3 +104,22 @@ RUN mkdir -p /var/www/html/storage/logs/ && \
     mkdir -p /var/www/html/storage/framework/views/ && \
     chown -R www-data:www-data /var/www/html/storage/ && \
     chmod -R 700 /var/www/html/storage/
+
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+FROM php-base AS php-test
+
+COPY tests/ tests/
+COPY phpunit.xml .
+
+COPY .env.testing .env
+
+RUN composer install
+
+RUN ./vendor/bin/phpunit
+
+FROM php-base AS php-prod
+
+COPY .env.prod .env
+
+RUN composer install --no-dev
