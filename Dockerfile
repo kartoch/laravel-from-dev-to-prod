@@ -120,6 +120,6 @@ RUN ./vendor/bin/phpunit
 
 FROM php-base AS php-prod
 
-COPY .env.prod .env
+COPY .env.production .env
 
 RUN composer install --no-dev
