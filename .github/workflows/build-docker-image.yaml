@@ -35,13 +35,23 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - 
-        name: Build and push
+        name: Build and push Laravel image
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
-          tags: kartoch/laravel-from-dev-to-prod:latest
+          tags: kartoch/laravel-prod:latest
           target: php-prod
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+      - 
+        name: Build and push Nginx image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: kartoch/nginx-prod:latest
+          target: nginx-prod
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
       - 
