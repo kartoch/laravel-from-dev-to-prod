@@ -1,31 +1,9 @@
 ARG COMPOSER_DOCKER_TAG=2.0.13
 ARG NODE_DOCKER_TAG=15.14.0-buster
 ARG PHP_DOCKER_TAG=8.0.6-fpm-buster
+ARG NGINX_DOCKER_TAG=1.20.1
 
-FROM node:${NODE_DOCKER_TAG} as node-base
-
-WORKDIR /home/node/app
-
-FROM node-base as node-prod
-
-COPY package.json .
-
-RUN npm install
-
-COPY webpack.mix.js .
-ADD resources/ resources/
-
-RUN npm run prod
-
-FROM node-base as node-dev
-
-CMD ["npm","run","watch"]
-
-COPY docker/node-entrypoint.sh /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
-
-FROM composer:${COMPOSER_DOCKER_TAG} as composer
+FROM composer:${COMPOSER_DOCKER_TAG} AS composer
 
 FROM php:${PHP_DOCKER_TAG} AS php-root
 
@@ -68,30 +46,13 @@ FROM php-root AS php-dev
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
-COPY docker/laravel-entrypoint.sh /entrypoint.sh
+#COPY docker/laravel-entrypoint.sh /entrypoint.sh
 
-CMD ["apache2-foreground"]
-
-ENTRYPOINT ["/entrypoint.sh"]
+#ENTRYPOINT ["/entrypoint.sh"]
 
 FROM php-root AS php-base
 
-COPY artisan .
-COPY app/ app/
-COPY bootstrap/ bootstrap/
-COPY config/ config/
-COPY database/ database/
-COPY resources/ resources/
-COPY routes/ routes/
-COPY server.php .
-
-COPY composer.json .
-COPY composer.lock .
-
-COPY --from=node-prod  /home/node/app/public/js/ public/js/
-COPY --from=node-prod  /home/node/app/public/css/ public/css/
-
-COPY public/* public/
+COPY . .
 
 RUN mkdir -p /var/www/html/storage/logs/ && \
     mkdir -p /var/www/html/storage/app/public/ && \
@@ -100,14 +61,13 @@ RUN mkdir -p /var/www/html/storage/logs/ && \
     mkdir -p /var/www/html/storage/framework/testing/ && \
     mkdir -p /var/www/html/storage/framework/views/ && \
     chown -R www-data:www-data /var/www/html/storage/ && \
-    chmod -R 700 /var/www/html/storage/
+    chmod -R 700 /var/www/html/storage/ && \
+    mkdir -p /var/www/html/bootstrap/cache/ && \
+    chown -R www-data:www-data /var/www/html/bootstrap/cache/
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 FROM php-base AS php-test
-
-COPY tests/ tests/
-COPY phpunit.xml .
 
 COPY .env.testing .env
 
@@ -120,3 +80,39 @@ FROM php-base AS php-prod
 COPY .env.production .env
 
 RUN composer install --no-dev
+
+FROM node:${NODE_DOCKER_TAG} AS node-base
+
+WORKDIR /home/node/app
+
+FROM node-base AS node-prod
+
+COPY --from=php-prod /var/www/html/ /home/node/app/
+
+RUN npm install
+
+RUN npm run production
+
+FROM node-base AS node-dev
+
+COPY docker/node-entrypoint.sh /entrypoint.sh
+
+CMD ["npm","run","watch"]
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+FROM nginx:${NGINX_DOCKER_TAG} AS nginx-base
+
+RUN rm /usr/share/nginx/html/*
+
+FROM nginx-base AS nginx-prod
+
+# XXX : using nginx conf from dev env
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY --from=node-prod  /home/node/app/public/ /usr/share/nginx/html/
+
+FROM nginx:${NGINX_DOCKER_TAG} AS nginx-dev
+
+# XXX : using nginx conf from dev env
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
