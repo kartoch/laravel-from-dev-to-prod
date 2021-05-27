@@ -19,8 +19,6 @@ RUN npm run prod
 
 FROM node-base as node-dev
 
-VOLUME /home/node/app
-
 CMD ["npm","run","watch"]
 
 COPY docker/node-entrypoint.sh /entrypoint.sh
@@ -64,8 +62,6 @@ RUN echo 'chdir = /var/www/html/public' >> /usr/local/etc/php-fpm.d/www.conf
 WORKDIR /var/www/html/
 
 FROM php-root AS php-dev
-
-VOLUME /var/www/html/
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
