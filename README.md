@@ -2,6 +2,10 @@
 
 **Goal**: build laravel docker image optimized from production but compatible for development based on the template provided by [https://laravel.build/](https://laravel.build/) without sail.
 
+## Goals
+
+
+
 ## Prerequisites
 
 Tested on Ubuntu 20.04 with the following tools :
@@ -23,11 +27,12 @@ git clone git@github.com:kartoch/laravel-from-dev-to-prod.git
 cd laravel-from-dev-to-prod
 docker-compose build
 docker-compose up
+docker exec -it laravel-from-dev-to-prod_laravel_1 composer install
 ```
 
 By default, Laravel application is available in port 80.
 
-The node image install the dependencies if not present, so except few minutes before mix dependencies are available.
+The node image install the dependencies at startup if not present, so except few seconds or minutes before mix dependencies are available.
 
 ## Production
 
@@ -43,3 +48,7 @@ The build includes :
 - building the mix resources from node image and copy them inside laravel image
 - install laravel resources (without dev dependencies) using composer
 - start phpunit
+
+## TODO
+
+- [ ] Switch to PHP FPM
