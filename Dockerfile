@@ -19,8 +19,6 @@ RUN npm run prod
 
 FROM node-base as node-dev
 
-VOLUME /home/node/app
-
 CMD ["npm","run","watch"]
 
 COPY docker/node-entrypoint.sh /entrypoint.sh
@@ -29,7 +27,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 FROM composer:${COMPOSER_DOCKER_TAG} as composer
 
-FROM php:8.0.6-apache-buster AS php-root
+FROM php:${PHP_DOCKER_TAG} AS php-root
 
 LABEL maintainer="Julien Cartigny <kartoch@gmail.com>"
 
@@ -66,8 +64,6 @@ RUN a2enmod negotiation && a2enmod rewrite
 WORKDIR /var/www/html/
 
 FROM php-root AS php-dev
-
-VOLUME /var/www/html/
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
