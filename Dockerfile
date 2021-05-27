@@ -29,7 +29,7 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 FROM composer:${COMPOSER_DOCKER_TAG} as composer
 
-FROM php:8.0.6-apache-buster AS php-root
+FROM php:${PHP_DOCKER_TAG} AS php-root
 
 LABEL maintainer="Julien Cartigny <kartoch@gmail.com>"
 
