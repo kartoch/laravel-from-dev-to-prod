@@ -1,6 +1,6 @@
 ARG COMPOSER_DOCKER_TAG=2.0.13
 ARG NODE_DOCKER_TAG=15.14.0-buster
-ARG PHP_DOCKER_TAG=8.0.6-apache-buster
+ARG PHP_DOCKER_TAG=8.0.6-fpm-buster
 
 FROM node:${NODE_DOCKER_TAG} as node-base
 
@@ -64,9 +64,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-COPY docker/000-default.conf /etc/apache2/sites-available/
-
-RUN a2enmod negotiation && a2enmod rewrite
+RUN echo 'chdir = /var/www/html/public' >> /usr/local/etc/php-fpm.d/www.conf 
 
 WORKDIR /var/www/html/
 
