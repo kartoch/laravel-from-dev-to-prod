@@ -47,4 +47,5 @@ The build includes :
 
 ## TODO
 
-- [ ] Switch to PHP FPM
+- [X] Switch to PHP FPM
+- [ ] Tests for webmix

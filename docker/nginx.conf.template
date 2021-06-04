@@ -14,7 +14,7 @@ try_files $uri $uri/ /index.php?$query_string;
 error_page 404 /index.php;
 
 location ~ \.php$ {
-fastcgi_pass laravel:9000;
+fastcgi_pass ${LARAVEL_SERVICE}:9000;
 fastcgi_param SCRIPT_FILENAME /var/www/html/public/$fastcgi_script_name;
 include fastcgi_params;
 }

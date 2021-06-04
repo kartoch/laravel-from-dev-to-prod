@@ -107,12 +107,12 @@ RUN rm /usr/share/nginx/html/*
 
 FROM nginx-base AS nginx-prod
 
-# XXX : using nginx conf from dev env
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
-
 COPY --from=node-prod  /home/node/app/public/ /usr/share/nginx/html/
+
+# XXX : using nginx conf from dev env
+COPY docker/nginx.conf.template /etc/nginx/templates/default.conf.template
 
 FROM nginx:${NGINX_DOCKER_TAG} AS nginx-dev
 
 # XXX : using nginx conf from dev env
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx.conf.template /etc/nginx/templates/default.conf.template
